@@ -16,9 +16,13 @@ const SpeechRecognitionEvent =
 
 // grammer -> these are all commands you can say, feel free to change
 const commands = ["start", "stop"];
+const colorCommands = ["red", "blue", "green", "aqua"]; // Add color commands
 const grammar = `#JSGF V1.0; grammar commands; public <command> = ${commands.join(
   " | "
-)};`;
+)}; public <color> = ${colorCommands.join(" | ")};`; // Include color commands in the grammar
+/*const grammar = `#JSGF V1.0; grammar commands; public <command> = ${commands.join(
+  " | "
+)};`;*/
 
 document.querySelector("#loading").style.display = "none";
 
@@ -28,7 +32,7 @@ const speechRecognitionList = new SpeechGrammarList();
 speechRecognitionList.addFromString(grammar, 1);
 recognition.grammars = speechRecognitionList;
 recognition.continuous = true;
-recognition.lang = "nl-NL";
+recognition.lang = /*"nl-NL"*/ "en-US";
 recognition.interimResults = false;
 
 // start listinging
@@ -45,23 +49,15 @@ recognition.onresult = function (event) {
   recognizedSpeech = recognizedSpeech.trim().toLowerCase();
 
   // update DOM
-  document.querySelector("#commando").innerHTML = recognizedSpeech;
+  /*document.querySelector("#commando").innerHTML = recognizedSpeech;*/
+  // Check for color commands
+  if (colorCommands.includes(recognizedSpeech)) {
+    // Change the color of the recognized text
+    document.querySelector("#commando").style.color = recognizedSpeech;
+  } else {
+    // Update DOM with recognized speech
+    /*document.querySelector("#commando").textContent = recognizedSpeech;*/
+    // Change the color back to default
+    document.querySelector("#commando").style.color = "white";
+  }
 };
-
-// the function that makes images
-const makeImage = async (prompt) => {
-  // showLoading();
-  let result = await inference.textToImage({
-    inputs: `${prompt}`,
-    model: "stabilityai/stable-diffusion-2",
-    parameters: {
-      negative_prompt: "blurry"
-    }
-  });
-  document.querySelector("#hf").src = URL.createObjectURL(result);
-  // hideLoading();
-};
-
-makeImage(
-  "foto van een laptop geschilderd door Vincent Van Gogh, laptop in de voorgrond, met een hond erop, in een bos, met een zonsondergang"
-);
